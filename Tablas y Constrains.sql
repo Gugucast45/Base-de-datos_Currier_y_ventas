@@ -12,12 +12,19 @@ create table if not exists Cliente(
     primary key (IdCliente)
 );
 
+create table if not exists Precio(
+	IdPrecio int not null auto_increment,
+    monto decimal(5,2) not null,
+    check (monto>=0),
+    primary key (IdPrecio)
+);
+
 create table if not exists Producto(
 	IdProducto int not null auto_increment,
-    Nombre varchar(80),
-    Precio decimal(5,2),
-    primary key (IdProducto),
-    check (Precio >=0)
+    Nombre varchar(80) not null,
+    IdPrecio int not null,
+    foreign key (IdPrecio) References Precio(IdPrecio),
+    primary key (IdProducto)
 );
 
 create table if not exists Currier(
@@ -43,11 +50,18 @@ create table if not exists Inconveniente(
     foreign key (IdSeguimiento) References Seguimiento(IdSeguimiento)
 );
 
+create table if not exists Estado(
+	IdEstado int not null auto_increment,
+    Nombre varchar(20) not null,
+    primary key (IdEstado)
+);
+
 create table if not exists Pedidos(
 	IdPedidos int not null auto_increment,
     Numero_Pedido varchar(20),
     Pagina_compra varchar(30),
     Precio_venta decimal(5,2),
+    IdEstado int not null, #En Reparto, Disponible, Vendido
     IdCliente int not null,
     IdProducto int not null,
     IdSeguimiento int not null,
@@ -55,6 +69,7 @@ create table if not exists Pedidos(
     foreign key (IdCliente) References Cliente(IdCliente),
     foreign key (IdProducto) References Producto(IdProducto),
     foreign key (IdSeguimiento) References Seguimiento(IdSeguimiento),
+    foreign key (IdEstado) References Estado(IdEstado),
     check (Precio_venta >0)
 );
 
