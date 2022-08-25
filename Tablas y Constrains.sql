@@ -1,30 +1,37 @@
-drop database if exists currier_ventas;
-create database if not exists currier_ventas ;
-use currier_ventas;
+drop database if exists emprendimiento;
+create database if not exists emprendimiento ;
+use emprendimiento;
 
 -- Creacion de las tablas
 
 create table if not exists Cliente(
-	IdCliente int not null auto_increment,
-    Nombre varchar(80),
-    Ciudad varchar(80),
-    Telefono char(10),
-    primary key (IdCliente)
-);
-
-create table if not exists Precio(
-	IdPrecio int not null auto_increment,
-    monto decimal(5,2) not null,
-    check (monto>=0),
-    primary key (IdPrecio)
+	IdCliente int primary key not null auto_increment,
+    Nombre varchar(100) not null,
+    Telefono char(10) not null
 );
 
 create table if not exists Producto(
 	IdProducto int not null auto_increment,
     Nombre varchar(80) not null,
-    IdPrecio int not null,
-    foreign key (IdPrecio) References Precio(IdPrecio),
     primary key (IdProducto)
+);
+
+create table if not exists Producto_en_venta(
+	IdProductoVenta int primary key not null auto_increment,
+	IdProducto int not null,
+    precio_venta decimal(5,2) not null,
+    stock int,
+    foreign key (IdProducto) references Producto(IdProducto),
+    check(stock>=0 and precio_venta>=0)
+);
+
+create table if not exists Compra(
+	IdCompra int primary key not null auto_increment,
+    IdCliente int not null,
+    IdProductoVenta int not null,
+    Fecha_venta date not null,
+    foreign key (IdCliente) References Cliente(IdCliente),
+    foreign key (IdProductoVenta) References Producto_en_venta(IdProductoVenta)
 );
 
 create table if not exists Currier(
@@ -36,53 +43,53 @@ create table if not exists Currier(
 
 create table if not exists Seguimiento(
 	IdSeguimiento int not null auto_increment,
-    Fecha_pedido date,
+    Numero_Pedido varchar(20) not null,
+    Fecha_pedido date not null,
     Fecha_entrega_USA date,
     Fecha_entrega_ECU date,
-	Fecha_venta date,
-    primary key (IdSeguimiento)
+    primary key (IdSeguimiento,Numero_Pedido)
 );
 create table if not exists Inconveniente(
 	IdInconveniente int not null auto_increment,
-    Descripcion varchar(200),
-    IdSeguimiento int,
+    Descripcion varchar(200) not null,
+    IdSeguimiento int not null,
+    Numero_Pedido varchar(20) not null,
     primary key (IdInconveniente),
-    foreign key (IdSeguimiento) References Seguimiento(IdSeguimiento)
+    foreign key (IdSeguimiento,Numero_Pedido) References Seguimiento(IdSeguimiento,Numero_Pedido)
 );
 
-create table if not exists Estado(
-	IdEstado int not null auto_increment,
-    Nombre varchar(20) not null,
-    primary key (IdEstado)
+create table if not exists Pagina(
+	Nombre varchar(30) primary key not null
 );
 
 create table if not exists Pedidos(
 	IdPedidos int not null auto_increment,
-    Numero_Pedido varchar(20),
-    Pagina_compra varchar(30),
-    Precio_venta decimal(5,2),
-    IdEstado int not null, #En Reparto, Disponible, Vendido
-    IdCliente int not null,
+    Precio_compra decimal(5,2) not null,
     IdProducto int not null,
     IdSeguimiento int not null,
+	Numero_Pedido varchar(20) not null,
+    Nombre_Pagina varchar(30) not null,
     primary key (IdPedidos),
-    foreign key (IdCliente) References Cliente(IdCliente),
+    foreign key (IdSeguimiento,Numero_Pedido) References Seguimiento(IdSeguimiento,Numero_Pedido),
     foreign key (IdProducto) References Producto(IdProducto),
-    foreign key (IdSeguimiento) References Seguimiento(IdSeguimiento),
-    foreign key (IdEstado) References Estado(IdEstado),
-    check (Precio_venta >0)
+    foreign key (Nombre_Pagina) References Pagina(Nombre),
+    check (Precio_compra >0)
 );
 
 create table if not exists Envio(
 	IdEnvio int not null auto_increment,
-    Peso decimal(4,2),
-    Precio decimal(5,2),
-    IdCurrier int,
-    IdPedidos int,
+    Peso decimal(4,2) not null,
+    Precio decimal(5,2) not null,
+    IdCurrier int not null,
+    IdPedidos int not null,
     primary key (IdEnvio),
     foreign key (IdPedidos) References Pedidos(IdPedidos),
-    foreign key (IdCurrier) References Currier(IdCurrier)
+    foreign key (IdCurrier) References Currier(IdCurrier),
+    check (Peso>=0 and Precio>=0)
 );
+
+			
+    
 
 
 
