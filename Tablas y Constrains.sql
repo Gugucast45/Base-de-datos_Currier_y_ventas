@@ -31,6 +31,8 @@ create table if not exists Compra(
     IdProductoVenta int not null,
     Fecha_venta date not null,
     cantidad int not null,
+    descuento decimal(4,2) not null,
+    gasto_entrega decimal(4,2) not null,
     foreign key (IdCliente) References Cliente(IdCliente),
     foreign key (IdProductoVenta) References Producto_en_venta(IdProductoVenta),
     check(cantidad>0)
