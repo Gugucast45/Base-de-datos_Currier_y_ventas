@@ -15,14 +15,19 @@ create table if not exists Producto(
     Nombre varchar(80) not null,
     primary key (IdProducto)
 );
-
+create table if not exists Stock(
+	IdStock int primary key not null auto_increment,
+    cantidad int not null,
+    check(cantidad>=0)
+);
 create table if not exists Producto_en_venta(
 	IdProductoVenta int primary key not null auto_increment,
 	IdPedidos int not null,
     precio_venta decimal(5,2) not null,
-    stock int,
+    IdStock int not null,
     foreign key (IdPedidos) references Pedidos(IdPedidos),
-    check(stock>=0 and precio_venta>=0)
+    foreign key (IdStock) references Stock(IdStock),
+    check(precio_venta>=0)
 );
 
 create table if not exists Compra(
