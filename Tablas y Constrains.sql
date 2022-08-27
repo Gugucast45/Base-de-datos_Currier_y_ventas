@@ -18,10 +18,10 @@ create table if not exists Producto(
 
 create table if not exists Producto_en_venta(
 	IdProductoVenta int primary key not null auto_increment,
-	IdProducto int not null,
+	IdPedidos int not null,
     precio_venta decimal(5,2) not null,
     stock int,
-    foreign key (IdProducto) references Producto(IdProducto),
+    foreign key (IdPedidos) references Pedidos(IdPedidos),
     check(stock>=0 and precio_venta>=0)
 );
 
@@ -31,8 +31,8 @@ create table if not exists Compra(
     IdProductoVenta int not null,
     Fecha_venta date not null,
     cantidad int not null,
-    descuento decimal(4,2) not null,
-    gasto_entrega decimal(4,2) not null,
+    descuento decimal(4,2) not null default(0),
+    gasto_entrega decimal(4,2) not null default(0),
     foreign key (IdCliente) References Cliente(IdCliente),
     foreign key (IdProductoVenta) References Producto_en_venta(IdProductoVenta),
     check(cantidad>0)
