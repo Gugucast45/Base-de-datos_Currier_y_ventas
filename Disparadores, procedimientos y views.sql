@@ -1,28 +1,23 @@
-# Disminuir Stock cuando se realice una compra
+# View de productos y sus stock
 
-delimiter &
-create trigger trg_disminuir_stock after insert on compra
-for each row
-begin 
-	set @buscar_stock = (Select distinct(s.IdStock) from compra c 
-						inner join (producto_en_venta pv, Stock s)
-                        on c.IdProductoVenta = pv.IdProductoVenta and pv.IdStock = s.IdStock
-                        where pv.IdProductoVenta= new.IdProductoVenta);
-	update stock set cantidad=cantidad - new.cantidad where @buscar_stock = IdStock;
-end &
-delimiter ;
+create view view_stock_de_productos as
+select p.Nombre as Producto, count(pv.IdProductoVenta) Cantidad from producto p 
+inner join (pedidos pe, producto_en_venta pv)
+on p.IdProducto = pe.IdProducto and pe.IdPedidos = pv.IdPedidos
+where pv.IdProductoVenta not in (select c.IdProductoVenta from compra) #Comprueba los productos que no hayan sido comprados
+group by p.IdProducto;
 
 # View de las ventas del mes
 
 create view view_ventas_del_mes as
--- Se presenta El nombre del cliente producto, cantidad, precio, descuento y precio final
-select cl.Nombre as Cliente,p.Nombre as Producto, c.cantidad as Cantidad, pv.precio_venta as Precio,
- c.descuento as Descuento,c.gasto_entrega as Gasto_entrega, (Precio-Descuento-Gasto_entrega) as Precio_final
-from producto p
-inner join (pedidos pe, producto_en_venta pv, compra c, cliente cl)
-on p.IdProducto = pe.IdProducto and pe.IdPedidos = pv.IdPedidos and 
-pv.IdProductoVenta = c.IdProductoVenta and c.IdCliente = cl.IdCliente
-group by c.IdCompra;
+select c.Nombre Cliente, pr.Nombre Producto, cp.Fecha_venta Fecha,(pv.precio_venta -cp.descuento - cp.gastos_entrega) Precio
+from cliente c
+inner join (compra cp, producto_en_venta pv, pedidos p, producto pr)
+on c.IdCliente = cp.IdCliente and cp.IdProductoVenta = pv.IdProductoVenta 
+	and pc.IdPedidos = p.IdPedidos and p.IdProducto = pr.IdProducto
+where extract(month FROM cp.Fecha_venta) = extract(month FROM now())
+group by cp.IdCompra
+;
 
 # View de los pedidos del mes
 
@@ -37,13 +32,11 @@ group by p.IdPedidos;
 
 # View ganancias del mes
 
-create view view_ganancias_del_mes as 
-select sum(pv.precio_venta*c.cantidad - c.descuento - c.gasto_entrega-e.Precio*c.cantidad) as Ganancia_mes from compra c
+create view view_ganancias_mes as
+select sum(pv.precio_venta-c.descuento-c.gasto_entrega-e.Precio) from compra c
 inner join (producto_en_venta pv, pedidos pe, envio e)
-on c.IdProductoVenta =pv.IdProductoVenta and pv.IdPedidos = pe.IdPedidos
-and pe.IdPedidos = e.IdPedidos
+on c.IdProductoVenta = pv.IdProductoVenta and pv.IdPedidos = pe.IdPedidos and pe.IdPedidos = e.IdPedidos
 where extract(month FROM c.Fecha_venta) = extract(month FROM now())
-group by c.IdCompra; 
+group by c.IdCompra;
 
-#
 
