@@ -15,25 +15,6 @@ create table if not exists Producto(
     Nombre varchar(80) not null,
     primary key (IdProducto)
 );
-create table if not exists Producto_en_venta(
-	IdProductoVenta int primary key not null auto_increment,
-	IdPedidos int not null,
-    precio_venta decimal(5,2) not null,
-    foreign key (IdPedidos) references Pedidos(IdPedidos),
-    check(precio_venta>=0)
-);
-
-create table if not exists Compra(
-	IdCompra int primary key not null auto_increment,
-    IdCliente int not null,
-    IdProductoVenta int not null,
-    Fecha_venta date not null,
-    descuento decimal(4,2) not null default(0),
-    gasto_entrega decimal(4,2) not null default(0),
-    foreign key (IdCliente) References Cliente(IdCliente),
-    foreign key (IdProductoVenta) References Producto_en_venta(IdProductoVenta),
-    check(cantidad>0)
-);
 
 create table if not exists Currier(
 	IdCurrier int not null auto_increment,
@@ -89,7 +70,24 @@ create table if not exists Envio(
     check (Peso>=0 and Precio>=0)
 );
 
-			
+create table if not exists Producto_en_venta(
+	IdProductoVenta int primary key not null auto_increment,
+	IdPedidos int not null,
+    precio_venta decimal(5,2),
+    foreign key (IdPedidos) references Pedidos(IdPedidos),
+    check(precio_venta>=0)
+);
+
+create table if not exists Compra(
+	IdCompra int primary key not null auto_increment,
+    IdCliente int not null,
+    IdProductoVenta int not null,
+    Fecha_venta date not null,
+    descuento decimal(4,2) not null default(0),
+    gasto_entrega decimal(4,2) not null default(0),
+    foreign key (IdCliente) References Cliente(IdCliente),
+    foreign key (IdProductoVenta) References Producto_en_venta(IdProductoVenta)
+);			
     
 
 
