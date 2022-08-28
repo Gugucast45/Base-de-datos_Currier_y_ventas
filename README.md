@@ -1,7 +1,6 @@
-# Base-de-datos_Currier_y_ventas
-Proyecto personal de una base de datos para un emprendimiento de un currier y ventas de productos
+# DataBase_Emprendimiento_de_ventas
+Proyecto personal de una base de datos para un emprendimiento ventas de productos para el manejo de mercaderia en sus fases de compra, seguimiento, disponibilidad del producto, ventas, inclusive ingresos y gastos.
 ## Link de referencia
 Mas información sobre la sintaxis de Mysql
 
-
-[w3schools](https://www.w3schools.com/mySQl/default.asp)
+[www.w3schools.com](https://www.w3schools.com/mySQl/default.asp)
